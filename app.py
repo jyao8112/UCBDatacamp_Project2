@@ -1,105 +1,91 @@
-import os
-
-import pandas as pd
+import datetime as dt
 import numpy as np
+import pandas as pd
 
 import sqlalchemy
-from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.ext.automap import automap_base 
 from sqlalchemy.orm import Session
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, func
 
-from flask import Flask, jsonify, render_template
-from flask_sqlalchemy import SQLAlchemy
-
-app = Flask(__name__)
+from flask import Flask, jsonify
 
 
 #################################################
 # Database Setup
 #################################################
-
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///meter_restaurant.sqlite"
-db = SQLAlchemy(app)
+engine = create_engine("sqlite:///meter_restaurant.sqlite")
 
 # reflect an existing database into a new model
 Base = automap_base()
 # reflect the tables
-Base.prepare(db.engine, reflect=True)
+Base.prepare(engine, reflect=True)
 
 # Save references to each table
 meters = Base.classes.meters
 restaurant_yelp = Base.classes.restaurant_yelp
 meter_restaurant = Base.classes.meter_restaurant
 
-categary_title = db.session.query(restaurant_yelp.categary_title).group_by(restaurant_yelp.categary_title).all()
-print(categary_title)
+# Create our session (link) from Python to the DB
+session = Session(engine)
 
-# results = Session.query(restaurant_yelp.categary_title).group_by(restaurant_yelp.categary_title).all()
-# print(results)
+#################################################
+# Flask Setup
+#################################################
+app = Flask(__name__)
+
 @app.route("/")
-def index():
-    """Return the homepage."""
-    return render_template("index.html")
+def welcome():
+    return (
+        f"our project data"
+      
+    )
+    
+# @app.route("/api/v1.0/street_name")
+# def objectids():
+#     """Return a list of stations."""
+#     results = session.query(meters.street_name).all()
+#     print(results)
+#     street_name = list(np.ravel(results))
+#     return jsonify(street_name)
 
+@app.route("/restaurant_yelp/location")
+def restaurant():
+    restaurants =[]
 
-@app.route("/names")
-def names():
-    """Return a list of sample names."""
+    """Return all columns of each restaurant"""
+    sel = [restaurant_yelp.name, 
+           restaurant_yelp.categary_title,
+           restaurant_yelp.latitude,
+           restaurant_yelp.longitude,
+           restaurant_yelp.price, 
+           restaurant_yelp.rating,
+           restaurant_yelp.review_count,
+           restaurant_yelp.display_phone,
+           restaurant_yelp.zip_code,
+           restaurant_yelp.image_url]
+    
+    results = session.query(*sel).all()
 
-    # Use Pandas to perform the sql query
-    categary_title = db.session.query(restaurant_yelp.categary_title).group_by(restaurant_yelp.categary_title).all()
+    # Create a dictionary entry for each row of restaurant information
+    for result in results:
+        restaurant = {}
+        restaurant["name"] = result[0]
+        restaurant["categary_title"] = result[1]
+        restaurant["latitude"] = result[2]
+        restaurant["longitude"] = result[3]
+        restaurant["coordinates"] = (result[2],result[3])
+        restaurant["price"] = result[4]
+        restaurant["rating"] = result[5]
+        restaurant["review_count"] = result[6]
+        restaurant["display_phone"] = result[7]
+        restaurant["zip"] = result[8]
+        restaurant["image_url"] = result[9]
 
-    # Return a list of the column names (sample names)
-    return jsonify(categary_title)
+        restaurants.append(restaurant)
+       
+    # print(restaurants)
+    
+    return jsonify(restaurants)   
 
-
-# @app.route("/metadata/<sample>")
-# def sample_metadata(sample):
-#     """Return the MetaData for a given sample."""
-#     sel = [
-#         Samples_Metadata.sample,
-#         Samples_Metadata.ETHNICITY,
-#         Samples_Metadata.GENDER,
-#         Samples_Metadata.AGE,
-#         Samples_Metadata.LOCATION,
-#         Samples_Metadata.BBTYPE,
-#         Samples_Metadata.WFREQ,
-#     ]
-
-#     results = db.session.query(*sel).filter(Samples_Metadata.sample == sample).all()
-
-#     # Create a dictionary entry for each row of metadata information
-#     sample_metadata = {}
-#     for result in results:
-#         sample_metadata["sample"] = result[0]
-#         sample_metadata["ETHNICITY"] = result[1]
-#         sample_metadata["GENDER"] = result[2]
-#         sample_metadata["AGE"] = result[3]
-#         sample_metadata["LOCATION"] = result[4]
-#         sample_metadata["BBTYPE"] = result[5]
-#         sample_metadata["WFREQ"] = result[6]
-
-#     print(sample_metadata)
-#     return jsonify(sample_metadata)
-
-
-# @app.route("/samples/<sample>")
-# def samples(sample):
-#     """Return `otu_ids`, `otu_labels`,and `sample_values`."""
-#     stmt = db.session.query(Samples).statement
-#     df = pd.read_sql_query(stmt, db.session.bind)
-
-#     # Filter the data based on the sample number and
-#     # only keep rows with values above 1
-#     sample_data = df.loc[df[sample] > 1, ["otu_id", "otu_label", sample]]
-#     # Format the data to send as json
-#     data = {
-#         "otu_ids": sample_data.otu_id.values.tolist(),
-#         "sample_values": sample_data[sample].values.tolist(),
-#         "otu_labels": sample_data.otu_label.tolist(),
-#     }
-#     return jsonify(data)
-
-
-if __name__ == "__main__":
-    app.run()
+if __name__ == '__main__':
+    app.run(port=8600)
