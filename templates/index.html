@@ -2,280 +2,100 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="description" content="">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>TEST MAP</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!-- Leaflet JS & CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css"
+  integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+  crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js"
+  integrity="sha512-tAGcCfR4Sc5ZP5ZoVz0quoZDYX5aCtEm/eu1KhSLj2c9eFrylXZknQYmxUssFaVJKvvc0dJQixhGjG2yXWiV9Q=="
+  crossorigin=""></script>
 
-    <!-- Title -->
-    <title>Rehomes - Real Estate HTML Template</title>
+  <!-- d3 JS -->
+  <script src="https://d3js.org/d3.v4.min.js"></script>
 
-    <!-- Favicon -->
-    <link rel="icon" href="./img/core-img/favicon.png">
-
-    <!-- Stylesheet -->
-    <link rel="stylesheet" href="style.css">
-
+  <!-- Marker Cluster JS & CSS -->
+  <script type="text/javascript" src="https://unpkg.com/leaflet.markercluster@1.0.3/dist/leaflet.markercluster.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet.markercluster@1.0.3/dist/MarkerCluster.css">
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet.markercluster@1.0.3/dist/MarkerCluster.Default.css">
 </head>
 
 <body>
-    <!-- Preloader -->
-    <div id="preloader">
-        <div class="loader"></div>
+  
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 jumbotron text-center">
+        <h1>Test Map</h1>
+        <p>group marker map of sf</p>
+      </div>
     </div>
-
-    <!-- **** Header Area Start **** -->
-    <header class="header-area">
-        <!-- Top Header Area Start -->
-        <div class="top-header-area">
-            <div class="container h-100">
-                <div class="row h-100 align-items-center">
-                    <div class="col-6">
-                        <div class="top-header-content">
-                            <a href="#"><i class="icon_mail"></i> <span>info.colorlib@gmail.com</span></a>
-                            <a href="#"><i class="icon_phone"></i> <span>(12) 345 6789</span></a>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="top-header-content">
-                            <!-- Top Social Area -->
-                            <div class="top-social-area ml-auto">
-                                <a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a>
-                                <a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>
-                                <a href="#"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
-                                <a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- Map Area -->
+    <div id="map" style="height:600px;"></div>
+    <!-- Filter  -->
+    
+    <div class="row">
+      <div class="col-md-3">
+        <div class="well">
+          <h5>SELECT Food Type:</h5>
+          <select id="foodtype" onchange="optionChanged(this.value)"></select>
         </div>
-        <!-- Top Header Area End -->
-
-        <!-- Main Header Start -->
-        <div class="main-header-area animated">
-            <div class="classy-nav-container breakpoint-off">
-                <div class="container">
-                    <!-- Classy Menu -->
-                    <nav class="classy-navbar justify-content-between" id="rehomesNav">
-
-                        <!-- Logo -->
-                        <a class="nav-brand" href="./index.html"><img src="./img/core-img/logo.png" alt=""></a>
-
-                        <!-- Navbar Toggler -->
-                        <div class="classy-navbar-toggler">
-                            <span class="navbarToggler"><span></span><span></span><span></span></span>
-                        </div>
-
-                        <!-- Menu -->
-                        <div class="classy-menu">
-                            <!-- Menu Close Button -->
-                            <div class="classycloseIcon">
-                                <div class="cross-wrap"><span class="top"></span><span class="bottom"></span></div>
-                            </div>
-                            <!-- Nav Start -->
-                            <div class="classynav">
-                                <ul id="nav">
-                                    <li class="active"><a href="./index.html">Home</a></li>
-                                    <li><a href="#">Pages</a>
-                                        <ul class="dropdown">
-                                            <li class="active"><a href="./index.html">- Home</a></li>
-                                            <li><a href="./about.html">- About</a></li>
-                                            <li><a href="./agent.html">- Agent</a></li>
-                                            <li><a href="./rent.html">- Rent</a></li>
-                                            <li><a href="./properties-details.html">- Property Details</a></li>
-                                            <li><a href="./blog.html">- Blog</a></li>
-                                            <li><a href="./single-blog.html">- Single Blog</a></li>
-                                            <li><a href="./contact.html">- Contact</a></li>
-                                            <li><a href="#">- Dropdown</a>
-                                                <ul class="dropdown">
-                                                    <li><a href="#">- Dropdown Item</a></li>
-                                                    <li><a href="#">- Dropdown Item</a></li>
-                                                    <li><a href="#">- Dropdown Item</a></li>
-                                                    <li><a href="#">- Dropdown Item</a></li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li><a href="./rent.html">Rent</a></li>
-                                    <li><a href="./agent.html">Agents</a></li>
-                                    <li><a href="./about.html">About</a></li>
-                                    <li><a href="./blog.html">Blog</a></li>
-                                </ul>
-
-                                <!-- Contact btn -->
-                                <div class="contact-btn mt-3 mt-lg-0 ml-3 ml-lg-5">
-                                    <a href="#">Contact Us</a>
-                                </div>
-                            </div>
-                            <!-- Nav End -->
-                        </div>
-                    </nav>
-                </div>
-            </div>
+          <h5>SELECT Rating</h5>
+          <select id="rating" onchange="optionChanged(this.value)"></select>
         </div>
-    </header>
-    <!-- **** Header Area End **** -->
-
-    <!-- **** Welcome Maps Area Start **** -->
-    <div class="welcome-area wow fadeInUp" data-wow-delay="200ms">
-        <div class="google-maps">
-            <!-- <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d17107.2892861271!2d-74.01626372475907!3d40.714272545051664!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c24fa5d33f083b%3A0xc80b8f06e177fe62!2sSan+Francisco%2C+SF%2C+USA!5e0!3m2!1sen!2sbd!4v1551762805743" allowfullscreen></iframe> -->
-            <iframe height="400" src="https://www.google.com/maps/embed/v1/view?key=AIzaSyDQFf4ZmW6ithxv_CjYJxrnkJAox9CYfkg&center=37.773972, -122.431297&zoom=13&maptype=satellite" allowfullscreen></iframe>
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h3 class="panel-title">Sample MetaData</h3>
+          </div>
+          <div id="sample-metadata" class="panel-body"></div>
         </div>
+      </div>
+      <div class="col-md-5">
+        <div id="pie"></div>
+      </div>
+      <div class="col-md-5">
+        <div id="gauge"></div>
+      </div>
     </div>
-    <!-- **** Welcome Maps Area End **** -->
-
-    <!-- **** Location Search Form Area **** -->
-    <div class="rehomes-search-form-area wow fadeInUp" data-wow-delay="200ms">
-        <div class="container">
-            <div class="rehomes-search-form">
-                <form action="#" method="post">
-                    <div class="row">
-                        <div class="col-12 col-lg-10">
-                            <div class="row">
-                                <div class="col-12 col-md-6 col-lg-3">
-                                    <select name="foodtype" id="foodtype" class="form-control">
-                                        <option value="foodtype">Food Type</option>
-                                        <!-- <option value="armenia">Armenia</option>
-                                        <option value="argentina">Argentina</option>
-                                        <option value="australia">Australia</option>
-                                        <option value="belgium">Belgium</option>
-                                        <option value="botswana">Botswana</option> -->
-                                    </select>
-                                </div>
-                                <div class="col-12 col-md-6 col-lg-3">
-                                    <select name="zipcode" id="zipcode" class="form-control">
-                                        <option value="zipcode">Zip Code</option>
-                                        <!-- <option value="commercial">Commercial</option>
-                                        <option value="office">Office</option>
-                                        <option value="villa">Villa</option>
-                                        <option value="apartment">Apartment</option>
-                                        <option value="condominium">Condominium</option> --> -->
-                                    </select>
-                                </div>
-                                <div class="col-12 col-md-6 col-lg-3">
-                                    <select name="open" id="open" class="form-control">
-                                        <option value="01">Open</option>
-                                        <!-- <option value="02">London</option>
-                                        <option value="03">Dhaka</option>
-                                        <option value="04">Singapore</option>
-                                        <option value="05">Comilla</option>
-                                        <option value="06">Delhi</option> -->
-                                    </select>
-                                </div>
-                                <!-- <div class="col-12 col-md-6 col-lg-3">
-                                    <select name="all" id="all" class="form-control">
-                                        <option value="01">For All</option>
-                                        <option value="02">02</option>
-                                        <option value="03">03</option>
-                                        <option value="04">04</option>
-                                        <option value="05">05</option>
-                                        <option value="06">06</option>
-                                    </select> -->
-                                <!-- </div>
-                                <div class="col-12 col-md-6 col-lg-3">
-                                    <select name="bedrooms" id="bedrooms" class="form-control">
-                                        <option value="bedrooms">Bedrooms</option>
-                                        <option value="01">01</option>
-                                        <option value="02">02</option>
-                                        <option value="03">03</option>
-                                        <option value="04">04</option>
-                                        <option value="05">05</option>
-                                        <option value="06">06</option>
-                                    </select>
-                                </div> -->
-                                <!-- <div class="col-12 col-md-6 col-lg-3">
-                                    <select name="bathroom" id="bathroom" class="form-control">
-                                        <option value="Bathroom">Bathroom</option>
-                                        <option value="01">01</option>
-                                        <option value="02">02</option>
-                                        <option value="03">03</option>
-                                        <option value="04">04</option>
-                                        <option value="05">05</option>
-                                        <option value="06">06</option>
-                                    </select>
-                                </div> -->
-                                <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="slider-range mb-15">
-                                        <div class="range-price text-white">Price [$ - $$$$]$</div>
-                                        <div class="slider-range-price ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" data-min="0" data-max="10000" data-unit="$" data-value-min="0" data-value-max="3000" data-label-result="Price">
-                                            <div class="ui-slider-range ui-widget-header ui-corner-all"></div>
-                                            <span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0"></span>
-                                            <span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- <div class="col-12 col-md-6 col-lg-3">
-                                    <div class="slider-range mb-15">
-                                        <div class="range-size text-white">Size [9762 - 72063]sqFt</div>
-                                        <div data-min="0" data-max="98623" data-unit="sqFt" class="slider-range-size ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" data-value-min="9762" data-value-max="72063" data-label-result="Size">
-                                            <div class="ui-slider-range ui-widget-header ui-corner-all"></div>
-                                            <span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0"></span>
-                                            <span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0"></span>
-                                        </div>
-                                    </div>
-                                </div> -->
-                            </div>
-                        </div>
-                        <div class="col-12 col-lg-2">
-                            <button type="submit" class="btn rehomes-search-btn">Search</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div id="bubble"></div>
     </div>
-    <!-- **** Location Search Form Area **** -->
+  </div>
+  <div class="col-md-10">
+    <div id="table-area" class="">
+      <table id="yelp-table" class="table table-striped">
+        <thead>
+          <tr>
+            <th class="table-head">Name</th>
+            <th class="table-head">Catagory</th>
+            <th class="table-head">Price</th>
+            <th class="table-head">Rating</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-md-10"></div>
 
-                
+   <!-- API key -->
+   <script type="text/javascript" src="static/js/config.js"></script>
 
-
-
-
-        <!-- Copywrite Area -->
-        <div class="copywrite-content">
-            <div class="container">
-                <div class="row align-items-center">
-                    <!-- Copywrite Text -->
-                    <div class="col-12 col-sm-6">
-                        <div class="copywrite-text">
-                            <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
-                        </div>
-                    </div>
-
-                    <!-- Footer Menu -->
-                    <div class="col-12 col-sm-6">
-                        <div class="footer-menu">
-                            <ul class="nav">
-                                <li><a href="#">Home</a></li>
-                                <li><a href="#">About us</a></li>
-                                <li><a href="#">Properties</a></li>
-                                <li><a href="#">Agents</a></li>
-                                <li><a href="#">Contact Us</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-    <!-- **** Footer Area End **** -->
-
-    <!-- **** All JS Files ***** -->
-    <!-- jQuery 2.2.4 -->
-    <script src="js/jquery.min.js"></script>
-    <!-- Popper -->
-    <script src="js/popper.min.js"></script>
-    <!-- Bootstrap -->
-    <script src="js/bootstrap.min.js"></script>
-    <!-- All Plugins -->
-    <script src="js/rehomes.bundle.js"></script>
-    <!-- Active -->
-    <script src="js/default-assets/active.js"></script>
-
+  <!-- <script src="https://cdn.plot.ly/plotly-1.31.2.min.js"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.5.0/d3.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <!-- <script src="{{ url_for('static', filename='js/bonus.js') }}"></script> -->
+  <!-- <script src="{{ url_for('static', filename='logic.js') }}"></script> -->
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <!-- <script src="{{ url_for('static', filename='config.js') }}"></script> -->
+    <!-- <script src="{{ url_for('static', filename='map.js') }}"></script>  -->
+  
 </body>
 
 </html>
