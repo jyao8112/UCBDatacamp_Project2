@@ -3,8 +3,19 @@ body {
   margin: 0;
 }
 
-#map,
+.map_area{
+  height: 600px;
+  width:400px
+  left:50px 
+}
 body,
 html {
   height: 100%;
+}
+
+#table-area{
+  height: 600px;
+  width:200px
+  padding-top: 20px;
+  padding-bottom: 5px;
 }
