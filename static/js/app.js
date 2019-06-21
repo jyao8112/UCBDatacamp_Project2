@@ -1,91 +1,3 @@
-// function buildMetadata(sample) {
-//   // Using `d3.json` to fetch the metadata for a sample
-//   // console.log(sample)
-//   d3.json(`/metadata/${sample}`).then(function(sampleData) {
-//     console.log(sampleData);
-    
-//     // Using d3 to select the panel with id of `#sample-metadata`
-//     var PANEL = d3.select("#sample-metadata");
-    
-//     // Using `.html("") to clear any existing metadata
-//     PANEL.html("");
-    
-//     // Using `Object.entries` to add each key and value pair to the panel
-//     // Using d3 to append new tags for each key-value in the metadata.
-//     Object.entries(sampleData).forEach(([key, value]) => {
-//       PANEL.append('h6').text(`${key}, ${value}`);
-//     })
-    
-//     // BONUS: Build the Gauge Chart
-//     // buildGauge(data.WFREQ);
-    
-    
-      
-//     })
-//   }
-  
-// function buildCharts(sample) {
-    
-//     // @TODO: Use `d3.json` to fetch the sample data for the plots
-    
-//     // @TODO: Build a Bubble Chart using the sample data
-    
-//     // @TODO: Build a Pie Chart
-//     // HINT: You will need to use slice() to grab the top 10 sample_values,
-//     // otu_ids, and labels (10 each).
-    
-//     // console.log(sample)  
-    // d3.json(`/yelpdata`).then(function (yelpData) {
-    //   console.log();
-      
-    //   //Building Pie Chart
-    //   var pieData = [{
-    //     values: .slice(0,10),
-    //     labels: .slice(0,10),
-    //     type: 'pie'
-    //   }];
-
-    //   var pieLayout = {
-    //     margin: {t: 0, l: 0}
-    //   }
-
-    //   Plotly.plot('pie', pieData, pieLayout); 
-    // });
-// }
-//       const otu_ids = sampleData.otu_ids;
-//       const otu_labels = sampleData.otu_labels;
-//       const sample_values = sampleData.sample_values;
-
-//       //Building Bubble chart
-//       var bubbleData = [{
-//         x: otu_ids,
-//         y: sample_values,
-//         text: otu_labels,
-//         mode: 'markers',
-//         marker: {
-//           size: sample_values,
-//           color: otu_ids,
-//           colorscale: 'Earth'
-//         }
-//       }];      
-
-//       var bubbleLayout = {
-//         margin: { t: 0 },
-//         hovermode: 'closest',
-//         xaxis: {title: 'OTU ID'},
-//       };
-
-//       Plotly.plot('bubble', bubbleData, bubbleLayout);
-
-//       
-  
-  
-  // const defaultURL = "/metadata/<sample>";
-  // d3.json(defaultURL).then(function (data) {
-  //   var data = [data];
-  //   var layout = { margin: { t: 30, b: 100 } };
-  //   Plotly.plot("bar", data, layout);
-  // });
 
 
 // Creating map object
@@ -150,6 +62,7 @@ function buildMapByData(data) {
   });
 
   myMap.addLayer(markers);
+
 }
 
 var meterMarkers;
@@ -165,13 +78,16 @@ function buildTableByData(data) {
       d3.json("/meterloc").then((data) => {
         var filteredMeter = data.filter(row => row["yelp_id"] === food.yelp_id);
         var meters = filteredMeter[0];
+          d3.json("http://api.sfpark.org/sfpark/rest/availabilityservice?lat="+meters.meter1[1]+"&"+"long="+meters.meter1[2]+"&radius=0.25&uom=mile&response=json",function(statusRes) {
+            var stationStatus = statusRes.AVL.TYPE;
+             console.log("meterstatus"+stationStatus)
+            });
         console.log(meters);
-        // d3.json("http://api.sfpark.org/sfpark/rest/availabilityservice?lat="+meters.meter1[1]+"&"+"long="+meters.meter1[2]+"&radius=0.25&uom=mile&response=json",function(statusRes) {
-        // var stationStatus = statusRes.AVL.TYPE;
-        //   console.log("meterstatus"+stationStatu)
-          
+        //  d3.json("https://gbfs.citibikenyc.com/gbfs/en/station_status.json", function(statusRes) {
+        //     var updatedAt = infoRes.last_updated;
+        //     console.log(updatedAt)});
         if (meterMarkers) {
-          myMap.removeLayer(meterMarkers)
+          myMap.removeLayer(meterMarkers);
         }
         
         var meterMarkers = L.markerClusterGroup();
@@ -187,11 +103,13 @@ function buildTableByData(data) {
         meterMarkers.addLayer(L.marker([meters.meter10[1], meters.meter10[2]]).bindPopup("meter10"));
 
         myMap.addLayer(meterMarkers);
-        // var group = new L.featureGroup([marker1, marker2, marker3]);
+        //var group = new L.featureGroup([marker1, marker2, marker3]);
         myMap.fitBounds(meterMarkers.getBounds());
+        
+        
       });
-
-      row.attr("style", "background-color: green;");
+      row.attr("style", "background-color: LightBlue");
+      
     });
 
     // console.log(category);

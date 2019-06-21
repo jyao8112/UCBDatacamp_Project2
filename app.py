@@ -148,7 +148,7 @@ def get_category():
 # @app.route('/testrtom')
 # def rtom():
 #     """Return a list of stations."""
-#     results = session.query(meter_restaurant.resturant_name).all()
+#     results = db.session.query(meter_restaurant.resturant_name).all()
 #     print(results)
 #     r_name = list(np.ravel(results))
 #     return jsonify(r_name)
@@ -194,7 +194,7 @@ def restaurant():
            restaurant_yelp.image_url,
            restaurant_yelp.yelp_id]
     
-    results = session.query(*sel).all()
+    results = db.session.query(*sel).all()
     # restaurant = {}
     # Create a dictionary entry for each row of restaurant information
     for result in results:
@@ -225,13 +225,13 @@ def meter():
 
     """Return all columns of meter"""
     sel = [meters.objectid, 
-           meters.street_num,
+           meters.street_num,  
            meters.street_name,
            meters.longitude,
            meters.latitude, 
            meters.meter_type]
 
-    results = session.query(*sel).all()
+    results = db.session.query(*sel).all()
 
     # Create a dictionary entry for each row of restaurant information
     for result in results:
