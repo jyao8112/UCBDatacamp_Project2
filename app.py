@@ -5,11 +5,13 @@ import numpy as np
 import sqlite3
 import pandas 
 
+import requests
+
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template,request
 from flask_sqlalchemy import SQLAlchemy
 
 import seaborn as sns
@@ -18,7 +20,7 @@ import seaborn as sns
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
-from sqlalchemy import create_engine, inspect, func
+from sqlalchemy import create_engine, inspect, func, Column, Integer, String, update
 
 app = Flask(__name__)
 
@@ -27,6 +29,8 @@ app = Flask(__name__)
 # Database Setup
 #################################################
 engine = create_engine("sqlite:///meter_restaurant.sqlite")
+
+
 
 # reflect an existing database into a new model
 Base = automap_base()
@@ -42,19 +46,38 @@ meter_restaurant = Base.classes.meter_restaurant
 session = Session(engine)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///meter_restaurant.sqlite"
 db = SQLAlchemy(app)
+
+# Add total likes Column
+# def add_column(engine, table_name, column):
+#     column_name = column.compile(dialect=engine.dialect)
+#     column_type = column.type.compile(engine.dialect)
+#     engine.execute('ALTER TABLE %s ADD %s %s DEFAULT(0)' %(table_name, column_name, column_type))
+
+# column = Column('likes', Integer)
+# add_column(engine, 'restaurant_yelp', column)
+# restaurant_yelp.update().values({"total_likes": 0})
+inspector_obj = inspect(engine)
+inspector_obj.get_table_names()
+columns = inspector_obj.get_columns('restaurant_yelp')
+for column in columns:
+    print(column["name"], column["type"])
+
 def meter_loc_resturant():
+  
     sel = [meters.objectid, 
            meters.street_num,
            meters.street_name,
            meters.longitude,
            meters.latitude, 
            meters.meter_type]
-    meters_json ={}
+    meters_json = {}
     results = db.session.query(*sel).all()
     for result in results:
             meter = {}
             meter["coordinates"] = (result[4],result[3])
             meter["meter_id"] = str(result[0])
+            meter["steet_num"] = str(result[1])
+            meter["steet_name"] = str(result[2])
             meters_json[result[0]]=meter
 
     sel2 = [meter_restaurant.yelp_id, 
@@ -67,7 +90,7 @@ def meter_loc_resturant():
            meter_restaurant.meter7,
            meter_restaurant.meter8,
            meter_restaurant.meter9,
-           meter_restaurant.meter10,
+           meter_restaurant.meter10
            ]
     results2 = db.session.query(*sel2).all()
     meter_to_restaurants_json=[]
@@ -89,39 +112,69 @@ def meter_loc_resturant():
             meter_to_restaurants_json.append(meter_to_restaurants)
     for i in meter_to_restaurants_json:
             coordinates = meters_json[i["meter1"]]["coordinates"]
-            i["meter1"]=[i["meter1"],coordinates[0],coordinates[1]]
-    
+            street_num = meters_json[i["meter1"]]["steet_num"]
+            street_name = meters_json[i["meter1"]]["steet_name"]
+            i["meter1"]=[i["meter1"],coordinates[0],coordinates[1],street_num + " " + street_name]
+            
             coordinates = meters_json[i["meter2"]]["coordinates"]
-            i["meter2"]=[i["meter2"],coordinates[0],coordinates[1]]
+            street_num = meters_json[i["meter2"]]["steet_num"]
+            street_name = meters_json[i["meter2"]]["steet_name"]
+            i["meter2"]=[i["meter2"],coordinates[0],coordinates[1],street_num + " " + street_name]
     
             coordinates = meters_json[i["meter3"]]["coordinates"]
-            i["meter3"]=[i["meter3"],coordinates[0],coordinates[1]]
+            street_num = meters_json[i["meter3"]]["steet_num"]
+            street_name = meters_json[i["meter3"]]["steet_name"]
+            i["meter3"]=[i["meter3"],coordinates[0],coordinates[1],street_num + " " + street_name]
     
             coordinates = meters_json[i["meter4"]]["coordinates"]
-            i["meter4"]=[i["meter4"],coordinates[0],coordinates[1]]
+            street_num = meters_json[i["meter4"]]["steet_num"]
+            street_name = meters_json[i["meter4"]]["steet_name"]
+            i["meter4"]=[i["meter4"],coordinates[0],coordinates[1],street_num + " " + street_name]
     
             coordinates = meters_json[i["meter5"]]["coordinates"]
-            i["meter5"]=[i["meter5"],coordinates[0],coordinates[1]]
+            street_num = meters_json[i["meter5"]]["steet_num"]
+            street_name = meters_json[i["meter5"]]["steet_name"]
+            i["meter5"]=[i["meter5"],coordinates[0],coordinates[1],street_num + " " + street_name]
     
             coordinates = meters_json[i["meter6"]]["coordinates"]
-            i["meter6"]=[i["meter6"],coordinates[0],coordinates[1]]
+            street_num = meters_json[i["meter6"]]["steet_num"]
+            street_name = meters_json[i["meter6"]]["steet_name"]
+            i["meter6"]=[i["meter6"],coordinates[0],coordinates[1],street_num + " " + street_name]
     
             coordinates = meters_json[i["meter7"]]["coordinates"]
-            i["meter7"]=[i["meter7"],coordinates[0],coordinates[1]]
+            street_num = meters_json[i["meter7"]]["steet_num"]
+            street_name = meters_json[i["meter7"]]["steet_name"]
+            i["meter7"]=[i["meter7"],coordinates[0],coordinates[1],street_num + " " + street_name]
     
             coordinates = meters_json[i["meter8"]]["coordinates"]
-            i["meter8"]=[i["meter8"],coordinates[0],coordinates[1]]
+            street_num = meters_json[i["meter8"]]["steet_num"]
+            street_name = meters_json[i["meter8"]]["steet_name"]
+            i["meter8"]=[i["meter8"],coordinates[0],coordinates[1],street_num + " " + street_name]
     
             coordinates = meters_json[i["meter9"]]["coordinates"]
-            i["meter9"]=[i["meter9"],coordinates[0],coordinates[1]]
+            street_num = meters_json[i["meter9"]]["steet_num"]
+            street_name = meters_json[i["meter9"]]["steet_name"]
+            i["meter9"]=[i["meter9"],coordinates[0],coordinates[1],street_num + " " + street_name]
     
             coordinates = meters_json[i["meter10"]]["coordinates"]
-            i["meter10"]=[i["meter10"],coordinates[0],coordinates[1]]
+            street_num = meters_json[i["meter10"]]["steet_num"]
+            street_name = meters_json[i["meter10"]]["steet_name"]
+            i["meter10"]=[i["meter10"],coordinates[0],coordinates[1],street_num + " " + street_name]
 
     return meter_to_restaurants_json
 
-meter_loc_resturant()
+class Favoritelist(db.Model):
+    __tablename__ = 'favoritelist'
 
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    foodtype = db.Column(db.String(64))
+    price = db.Column(db.String(64))
+    rating = db.Column(db.String(64))
+    likecount = db.Column(db.Integer)
+
+    def __repr__(self):
+        return '<Favorite %r>' % (self.name)
 #################################################
 # Flask Setup
 #################################################
@@ -130,6 +183,9 @@ meter_loc_resturant()
 def welcome():
     return render_template("index.html")
 
+@app.route("/map/")
+def map():
+    return render_template("map.html")
 # @app.route("/testmeters")
 # def objectids():
 #     """Return a list of stations."""
@@ -144,38 +200,6 @@ def get_category():
     print(results)
     category = list(np.ravel(results))
     return jsonify(category)
-
-# @app.route('/testrtom')
-# def rtom():
-#     """Return a list of stations."""
-#     results = db.session.query(meter_restaurant.resturant_name).all()
-#     print(results)
-#     r_name = list(np.ravel(results))
-#     return jsonify(r_name)
-
-
-@app.route("/resturant_stat1")
-
-def stat_typrnum():
-    """return restaurant types and count for stat charts"""
-    # food_type = session.query(restaurant_yelp.category_title, func.count(restaurant_yelp.category_title)).\
-    # group_by(restaurant_yelp.category_title).order_by(func.count(restaurant_yelp.category_title).desc()).all()
-    food_type = session.query(restaurant_yelp.category_title, func.count(restaurant_yelp.review_count)).\
-    group_by(restaurant_yelp.category_title).order_by(func.count(restaurant_yelp.review_count).desc()).all()
-    return jsonify(food_type)
-
-@app.route("/resturant_stat2")
-def stat_review():
-    "return restaurant types and total review counts for each type"
-    sel = [restaurant_yelp.category_title, 
-            func.sum(restaurant_yelp.review_count),
-            func.avg(restaurant_yelp.review_count)]
-
-    results = session.query(*sel).group_by(restaurant_yelp.category_title).order_by(restaurant_yelp.category_title).all()
-
-
-    return jsonify(results)
-
 
 @app.route("/yelpdata")
 def restaurant():
@@ -192,7 +216,10 @@ def restaurant():
            restaurant_yelp.display_phone,
            restaurant_yelp.zip_code,
            restaurant_yelp.image_url,
-           restaurant_yelp.yelp_id]
+           restaurant_yelp.yelp_id,
+           restaurant_yelp.address,
+           restaurant_yelp.city,
+           restaurant_yelp.likes]
     
     results = db.session.query(*sel).all()
     # restaurant = {}
@@ -207,10 +234,14 @@ def restaurant():
         restaurant["price"] = result[4]
         restaurant["rating"] = result[5]
         restaurant["review_count"] = result[6]
-        restaurant["display_phone"] = result[7]
+        restaurant["display_phone"] = str(result[7])
         restaurant["zip"] = result[8]
         restaurant["image_url"] = result[9]
         restaurant["yelp_id"] = result[10]
+        restaurant['address']=result[11]
+        restaurant['city']=result[12]
+        restaurant["likes"]=result[13]
+        
 
         restaurants.append(restaurant)
        
@@ -299,10 +330,37 @@ def meter():
 @app.route("/meterloc")
 def meterlocation():
     meterloc=meter_loc_resturant()
-    
-
     return jsonify(meterloc)
+
+@app.route("/favlist/<yelp_id>", methods=['GET','POST'])
+def favoritelist(yelp_id):
+    # print("yelp_id: " + yelp_id)
+    if request.method == "POST":
+        data = request.get_json()
+        result = db.session.query(restaurant_yelp).filter(restaurant_yelp.yelp_id==yelp_id).first()
+        # result = db.session.query(restaurant_yelp).get(yelp_id)
+        result.likes = data["likes"]
+        # print(result.likes);
+        # db.session.dirty
+        db.session.commit()
+        # restaurant = {"":"", }
+        # db.session.add(pet)
+        # db.session.commit()
+    return jsonify(status="success", data=data)
+
+        
+
+# @app.route("/meterstatus", methods=['GET','POST'])
+# def meterstatus():
+#     if request.method == "POST":   
+#         metersdata = request.get_json()
+#         print(metersdata["meter1"][0], metersdata["meter1"][1], metersdata["meter1"][2])
+#         url = 'http://api.sfpark.org/sfpark/rest/availabilityservice?lat=37.7622866993&long=-122.4217428991&radius=0.25&uom=mile&response=json'
+#         r = requests.get(url).json()
+#         print(r)
+       
     
+#     return jsonify(status="success", data=metersdata)
 
 if __name__ == '__main__':
     app.run(port=8100)

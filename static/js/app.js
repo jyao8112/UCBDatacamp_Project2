@@ -62,65 +62,180 @@ function buildMapByData(data) {
   });
 
   myMap.addLayer(markers);
-
-}
-
+  }
+var favlist = [];
 var meterMarkers;
 function buildTableByData(data) {
   tbody.html("");
   data.forEach((food) => {
-    // categories.push([food.name, food.category_title, food.price, food.rating]);
-    var category = [food.name, food.category_title, food.price, food.rating];
-    var row = tbody.append("tr");
-    // row.attr("yelp-id", food.yelp_id);
-    row.on('click',function() {
+    var category = [food.name, food.category_title, food.price, food.rating, food.likes, food.yelp_id,food.latitude,food.longitude];
+
+    // var category = { "name": food.name, 
+    //                   "category": food.category_title, 
+    //                   "price": food.price, 
+    //                   "rating": food.rating, 
+    //                   "likes": food.likes, 
+    //                   "id": food.yelp_id};
+
+    var row = tbody.append("tr");   
+    row.attr("isSelected", "false"); 
+    
+    // Object.values(category).forEach((value) => {
+    //   var cell = row.append("td");
+    //   cell.text(value);
+    // });
+    
+    var likesColCell;
+    for (i = 0; i < 5; i++) {
+      var value = category[i]; 
+      var cell = row.append("td");
+      cell.text(value);
+      if (i == 4) {
+        likesColCell = cell;
+      }
+    };  
+
+    var selected = row.append("td");
+    var button = selected.append("button");
+
+    button.attr("isBtnSelected", "false");
+    button.attr("style", "width");
+    button.text("add");
+
+    //Add Button
+    button.on('click',function() {
+
       var meterStatus
       d3.json("/meterloc").then((data) => {
         var filteredMeter = data.filter(row => row["yelp_id"] === food.yelp_id);
         var meters = filteredMeter[0];
-          d3.json("http://api.sfpark.org/sfpark/rest/availabilityservice?lat="+meters.meter1[1]+"&"+"long="+meters.meter1[2]+"&radius=0.25&uom=mile&response=json",function(statusRes) {
-            var stationStatus = statusRes.AVL.TYPE;
-             console.log("meterstatus"+stationStatus)
-            });
+        //d3.json("http://api.sfpark.org/sfpark/rest/availabilityservice?lat="+meters.meter1[1]+"&"+"long="+meters.meter1[2]+"&radius=0.01&uom=mile&response=json",function(statusRes) {
+        //  console.log(statusRes)
+        //});
         console.log(meters);
-        //  d3.json("https://gbfs.citibikenyc.com/gbfs/en/station_status.json", function(statusRes) {
-        //     var updatedAt = infoRes.last_updated;
-        //     console.log(updatedAt)});
-        if (meterMarkers) {
+
+        // firstly, empty the whole fav table
+        var html, element;
+        // Create HTML string with placeholder text
+        element = ".containerFav";
+        document.querySelectorAll(".containerFav-cat").forEach(e => e.parentNode.removeChild(e));
+        // update fav list 
+        if (button.attr("isBtnSelected") == "false") {
+          // update isSelected to true
+            button.attr("isBtnSelected", "true");
+            row.attr("isSelected", "true");
+            row.attr("style", "background-color: LightBlue"); 
+            // add selected category to fav list
+            favlist.push(category);
+            button.attr("style", "background-color: Blue; color: White");  
+            category[4]++;   
+          } 
+          else {
+           // update isSelected to false
+            button.attr("isBtnSelected", "false");
+            // remove unselected category from fav list
+            favlist = favlist.filter((elem) => {
+                return elem[0] !== category[0];
+            });
+            category[4]--; 
+            button.attr("style", "background-color: White; color: Black");    
+         }
+
+         console.log("fav list: ", favlist);
+
+        // create new fav list
+        // favlist.forEach((category) => {
+        //   const html = '<div class="containerFav-cat"><p>%category%<p></div>';
+        //   const newHtml = html.replace('%category%', category);
+        //   document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
+        // });
+        // counter.attr("count", newCount);
+        // counter.text(newCount);
+       
+        // category[4] += newCount;
+        likesColCell.text(category[4]);
+        
+        $.ajax({
+        type: "POST",
+        url: "/favlist/" + category[5],
+        contentType: "application/json",
+        data: JSON.stringify({"likes" : category[4]}),
+        dataType: "json",
+        success: function(response) {
+            console.log(response);
+        },
+        error: function(err) {
+            console.log(err);
+        }
+        });
+      });
+       
+    });
+
+    //Add Row
+    row.on('click', function() {
+      if (row.attr("isSelected") == "false") {
+        // update isSelected to true
+          row.attr("isSelected", "true");
+          row.attr("style", "background-color: LightBlue"); 
+        } 
+        else {
+         // update isSelected to false
+          row.attr("isSelected", "false");
+          row.attr("style", "background-color: White"); 
+       }
+
+      //Filter meter and add selected meter according to yelp_ID
+       var meterStatus
+       d3.json("/meterloc").then((data) => {
+        var filteredMeter = data.filter(row => row["yelp_id"] === food.yelp_id);
+        var meters = filteredMeter[0];
+        //d3.json("http://api.sfpark.org/sfpark/rest/availabilityservice?lat="+meters.meter1[1]+"&"+"long="+meters.meter1[2]+"&radius=0.01&uom=mile&response=json",function(statusRes) {
+        //  console.log(statusRes)
+        //});
+        console.log(meters);
+         
+        // $.ajax({
+        // type: "POST",
+        // url: "/favlist",
+        // contentType: "application/json",
+        // data: JSON.stringify(category),
+        // dataType: "json",
+        // success: function(response) {
+        //     console.log(response);
+        // },
+        // error: function(err) {
+        //     console.log(err);
+        // }
+        // });
+                 
+        
+      if (meterMarkers) {
           myMap.removeLayer(meterMarkers);
         }
         
         var meterMarkers = L.markerClusterGroup();
-        meterMarkers.addLayer(L.marker([meters.meter1[1], meters.meter1[2]]).bindPopup("meter1"));
-        meterMarkers.addLayer(L.marker([meters.meter2[1], meters.meter2[2]]).bindPopup("meter2"));
-        meterMarkers.addLayer(L.marker([meters.meter3[1], meters.meter3[2]]).bindPopup("meter3"));
-        meterMarkers.addLayer(L.marker([meters.meter4[1], meters.meter4[2]]).bindPopup("meter4"));
-        meterMarkers.addLayer(L.marker([meters.meter5[1], meters.meter5[2]]).bindPopup("meter5"));
-        meterMarkers.addLayer(L.marker([meters.meter6[1], meters.meter6[2]]).bindPopup("meter6"));
-        meterMarkers.addLayer(L.marker([meters.meter7[1], meters.meter7[2]]).bindPopup("meter7"));
-        meterMarkers.addLayer(L.marker([meters.meter8[1], meters.meter8[2]]).bindPopup("meter8"));
-        meterMarkers.addLayer(L.marker([meters.meter9[1], meters.meter9[2]]).bindPopup("meter9"));
-        meterMarkers.addLayer(L.marker([meters.meter10[1], meters.meter10[2]]).bindPopup("meter10"));
+        meterMarkers.addLayer(L.marker([meters.meter1[1], meters.meter1[2]]).bindPopup("meter1"+"</br>"+meters.meter1[3]));
+        meterMarkers.addLayer(L.marker([meters.meter2[1], meters.meter2[2]]).bindPopup("meter2"+"</br>"+meters.meter2[3]));
+        meterMarkers.addLayer(L.marker([meters.meter3[1], meters.meter3[2]]).bindPopup( "meter3"+"</br>"+meters.meter3[3]));
+        meterMarkers.addLayer(L.marker([meters.meter4[1], meters.meter4[2]]).bindPopup("meter4"+"</br>"+meters.meter4[3]));
+        meterMarkers.addLayer(L.marker([meters.meter5[1], meters.meter5[2]]).bindPopup("meter5"+"</br>"+meters.meter5[3]));
+        meterMarkers.addLayer(L.marker([meters.meter6[1], meters.meter6[2]]).bindPopup("meter6"+"</br>"+meters.meter6[3]));
+        meterMarkers.addLayer(L.marker([meters.meter7[1], meters.meter7[2]]).bindPopup("meter7"+"</br>"+meters.meter7[3]));
+        meterMarkers.addLayer(L.marker([meters.meter8[1], meters.meter8[2]]).bindPopup("meter8"+"</br>"+meters.meter8[3]));
+        meterMarkers.addLayer(L.marker([meters.meter9[1], meters.meter9[2]]).bindPopup("meter9"+"</br>"+meters.meter9[3]));
+        meterMarkers.addLayer(L.marker([meters.meter10[1], meters.meter10[2]]).bindPopup("meter10"+"</br>"+meters.meter10[3]));
 
         myMap.addLayer(meterMarkers);
         //var group = new L.featureGroup([marker1, marker2, marker3]);
         myMap.fitBounds(meterMarkers.getBounds());
-        
-        
       });
-      row.attr("style", "background-color: LightBlue");
-      
+
+
     });
+  })
 
-    // console.log(category);
-    Object.values(category).forEach((value) => {
-      var cell = row.append("td");
-      cell.text(value);
-    
-     });
-   });
 }
-
 
 
 function updateFilters() {
@@ -160,7 +275,7 @@ function init() {
         .text(sample)
         .property("value", sample);
     });
-
+   
     // Use the first sample from the list to build the initial plots
     const firstSample = sampleNames[0];
     // buildCharts(firstSample);
