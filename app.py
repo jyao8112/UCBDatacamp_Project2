@@ -11,7 +11,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 
-from flask import Flask, jsonify, render_template,request
+from flask import Flask, jsonify, render_template,request,redirect,session
 from flask_sqlalchemy import SQLAlchemy
 
 import seaborn as sns
@@ -56,11 +56,11 @@ db = SQLAlchemy(app)
 # column = Column('likes', Integer)
 # add_column(engine, 'restaurant_yelp', column)
 # restaurant_yelp.update().values({"total_likes": 0})
-inspector_obj = inspect(engine)
-inspector_obj.get_table_names()
-columns = inspector_obj.get_columns('restaurant_yelp')
-for column in columns:
-    print(column["name"], column["type"])
+# inspector_obj = inspect(engine)
+# inspector_obj.get_table_names()
+# columns = inspector_obj.get_columns('restaurant_yelp')
+# for column in columns:
+#     print(column["name"], column["type"])
 
 def meter_loc_resturant():
   
@@ -186,18 +186,10 @@ def welcome():
 @app.route("/map/")
 def map():
     return render_template("map.html")
-# @app.route("/testmeters")
-# def objectids():
-#     """Return a list of stations."""
-#     results = session.query(meters.street_name).all()
-#     print(results)
-#     street_name = list(np.ravel(results))
-#     return jsonify(street_name)
 
 @app.route("/foodtype")
 def get_category():
     results = db.session.query(restaurant_yelp.category_title).group_by(restaurant_yelp.category_title).all()
-    print(results)
     category = list(np.ravel(results))
     return jsonify(category)
 
@@ -275,57 +267,13 @@ def meter():
         meter["coordinates"] = (result[4],result[3])
         meter["longitude"] = result[3]
         meter["meter_type"] = result[5]
+        meter['status']=np.random.randint(2)
         
-
         meters_json.append(meter)
-       
-    # print(restaurants)
     
     return jsonify(meters_json)   
 
-# @app.route("/mtor")
-# def meter_to_restaurants():
-#     meter_to_restaurants_json =[]
-
-#     """Return all columns of meter"""
-#     sel = [meter_restaurant.yelp_id, 
-#            meter_restaurant.resturant_name,
-#            meter_restaurant.meter1,
-#            meter_restaurant.meter2,
-#            meter_restaurant.meter3,
-#            meter_restaurant.meter4, 
-#            meter_restaurant.meter5,
-#            meter_restaurant.meter6,
-#            meter_restaurant.meter7,
-#            meter_restaurant.meter8,
-#            meter_restaurant.meter9,
-#            meter_restaurant.meter10,
-#            ]
-
-#     results = session.query(*sel).all()
-
-#     # Create a dictionary entry for each row of restaurant information
-#     for result in results:
-#         meter_to_restaurants = {}
-
-#         meter_to_restaurants["yelp_id"] = result[0]
-#         meter_to_restaurants["meter1"] = result[1]
-#         meter_to_restaurants["meter2"] = result[2]
-#         meter_to_restaurants["meter3"] = result[3]
-#         meter_to_restaurants["meter4"] = result[4]
-#         meter_to_restaurants["meter5"] = result[5]
-#         meter_to_restaurants["meter6"] = result[6]
-#         meter_to_restaurants["meter7"] = result[7]
-#         meter_to_restaurants["meter8"] = result[8]
-#         meter_to_restaurants["meter9"] = result[9]
-#         meter_to_restaurants["meter10"] = result[10]
-#         meter_to_restaurants["resturant_name"] = result[11]
-        
-#         meter_to_restaurants_json.append(meter_to_restaurants)
-       
-#     # print(restaurants)
-    
-#     return jsonify(meter_to_restaurants_json)  
+ 
 
 @app.route("/meterloc")
 def meterlocation():
@@ -334,33 +282,96 @@ def meterlocation():
 
 @app.route("/favlist/<yelp_id>", methods=['GET','POST'])
 def favoritelist(yelp_id):
-    # print("yelp_id: " + yelp_id)
     if request.method == "POST":
         data = request.get_json()
         result = db.session.query(restaurant_yelp).filter(restaurant_yelp.yelp_id==yelp_id).first()
-        # result = db.session.query(restaurant_yelp).get(yelp_id)
         result.likes = data["likes"]
-        # print(result.likes);
-        # db.session.dirty
         db.session.commit()
-        # restaurant = {"":"", }
-        # db.session.add(pet)
-        # db.session.commit()
     return jsonify(status="success", data=data)
 
         
 
-# @app.route("/meterstatus", methods=['GET','POST'])
-# def meterstatus():
-#     if request.method == "POST":   
-#         metersdata = request.get_json()
-#         print(metersdata["meter1"][0], metersdata["meter1"][1], metersdata["meter1"][2])
-#         url = 'http://api.sfpark.org/sfpark/rest/availabilityservice?lat=37.7622866993&long=-122.4217428991&radius=0.25&uom=mile&response=json'
-#         r = requests.get(url).json()
-#         print(r)
-       
+@app.route("/meterstatus", methods=['GET','POST'])
+def meterstatus():
+    meters_json = []
+    if request.method == "POST":
+        print("receive meterstatus")
+        metersdata = request.get_json()
+        # print(metersdata["meter1"][0], metersdata["meter1"][1], metersdata["meter1"][2])
+        # print(metersdata["meter2"][0], metersdata["meter2"][1], metersdata["meter2"][2])
+        # url = 'http://api.sfpark.org/sfpark/rest/availabilityservice?lat='+str(metersdata["meter1"][1])+"&"+"long="+str(metersdata["meter1"][2])+'&radius=0.01&uom=mile&response=json'
+        # r = requests.get(url).json()
+        # print(metersdata)
+        #result = db.session.query(meters).filter(meters.objectid==metersdata["meter1"][0]).first()
+        
+        meterstatusdict = {}
+        meterstatusdict["meter_id"] = metersdata["meter1"][0]
+        meterstatusdict["status"] = np.random.randint(2)
+        meters_json.append(meterstatusdict)
+
+        meterstatusdict2 = {}
+        meterstatusdict2["meter_id"] = metersdata["meter2"][0]
+        meterstatusdict2["status"] = np.random.randint(2)
+        meters_json.append(meterstatusdict2)
+
+        meterstatusdict3 = {}
+        meterstatusdict3["meter_id"] = metersdata["meter3"][0]
+        meterstatusdict3["status"] = np.random.randint(2)
+        meters_json.append(meterstatusdict3)
+
+        meterstatusdict4 = {}
+        meterstatusdict4["meter_id"] = metersdata["meter4"][0]
+        meterstatusdict4["status"] = np.random.randint(2)
+        meters_json.append(meterstatusdict4)
+
+        meterstatusdict5 = {}
+        meterstatusdict5["meter_id"] = metersdata["meter5"][0]
+        meterstatusdict5["status"] = np.random.randint(2)
+        meters_json.append(meterstatusdict5)
+
+        meterstatusdict6 = {}
+        meterstatusdict6["meter_id"] = metersdata["meter6"][0]
+        meterstatusdict6["status"] = np.random.randint(2)
+        meters_json.append(meterstatusdict6)
+
+        meterstatusdict7 = {}
+        meterstatusdict7["meter_id"] = metersdata["meter7"][0]
+        meterstatusdict7["status"] = np.random.randint(2)
+        meters_json.append(meterstatusdict7)
+
+        meterstatusdict8 = {}
+        meterstatusdict8["meter_id"] = metersdata["meter8"][0]
+        meterstatusdict8["status"] = np.random.randint(2)
+        meters_json.append(meterstatusdict8)
+
+        meterstatusdict9 = {}
+        meterstatusdict9["meter_id"] = metersdata["meter9"][0]
+        meterstatusdict9["status"] = np.random.randint(2)
+        meters_json.append(meterstatusdict9)
+
+        meterstatusdict10 = {}
+        meterstatusdict10["meter_id"] = metersdata["meter10"][0]
+        meterstatusdict10["status"] = np.random.randint(2)
+        meters_json.append(meterstatusdict10)
     
-#     return jsonify(status="success", data=metersdata)
+        print(meters_json)
+
+    return jsonify(meters_json)
+
+@app.route('/favcart/',methods=['GET','POST'])
+def updateting_favcart():
+    if request.method == "POST":
+        favlist = request.get_json()
+        if 'favlist' in session:
+            session['favlist'].append(favlist)
+            session.modified = True
+        else:
+            session['favlist']= favlist
+        print(favlist)
+        return favlist
+
+
+ 
 
 if __name__ == '__main__':
     app.run(port=8100)

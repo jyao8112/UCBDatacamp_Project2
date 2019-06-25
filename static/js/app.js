@@ -2,7 +2,6 @@
 
 // Creating map object
 var myMap = L.map("map", {
-  // center: [40.7, -73.95],
   center: [37.7749, -122.44],
   zoom: 13
 });
@@ -26,26 +25,28 @@ function buildFullTable() {
     buildMapByData(data);
   });
 }
-
+//define different icon 
 var StoreIcon = L.icon({
   iconUrl: 'https://image.flaticon.com/icons/svg/1916/1916263.svg',
   iconSize: [38, 95],
   iconAnchor: [22, 94],
   popupAnchor: [-3, -76],
 });
-var OpenMeter = L.icon({
-  iconUrl: 'https://image.flaticon.com/icons/svg/148/148767.svg',
-  iconSize: [38, 95],
-  iconAnchor: [22, 94],
-  popupAnchor: [-3, -76],
-});
-var closeMeter = L.icon({
-  iconUrl: 'https://image.flaticon.com/icons/svg/148/148766.svg',
-  iconSize: [38, 95],
-  iconAnchor: [22, 94],
-  popupAnchor: [-3, -76],
-});
 
+var icons = {
+  OpenMeter: L.icon({
+    iconUrl: 'https://image.flaticon.com/icons/svg/148/148767.svg',
+    iconSize: [25, 75],
+    iconAnchor: [22, 94],
+    popupAnchor: [-3, -76],
+  }),
+  CloseMeter: L.icon({
+    iconUrl: 'https://image.flaticon.com/icons/svg/148/148766.svg',
+    iconSize: [25, 7  5],
+    iconAnchor: [22, 94],
+    popupAnchor: [-3, -76],
+  })
+};
 
 //L.marker([50.505, 30.57], {icon: myIcon}).addTo(map);
 
@@ -100,7 +101,7 @@ function buildTableByData(data) {
 
     button.attr("isBtnSelected", "false");
     button.attr("style", "width");
-    button.text("add");
+    button.text("like");
 
     //Add Button
     button.on('click',function() {
@@ -123,6 +124,7 @@ function buildTableByData(data) {
         if (button.attr("isBtnSelected") == "false") {
           // update isSelected to true
             button.attr("isBtnSelected", "true");
+            button.text("liked");
             row.attr("isSelected", "true");
             row.attr("style", "background-color: LightBlue"); 
             // add selected category to fav list
@@ -133,6 +135,7 @@ function buildTableByData(data) {
           else {
            // update isSelected to false
             button.attr("isBtnSelected", "false");
+            button.text("like");
             // remove unselected category from fav list
             favlist = favlist.filter((elem) => {
                 return elem[0] !== category[0];
@@ -142,6 +145,20 @@ function buildTableByData(data) {
          }
 
          console.log("fav list: ", favlist);
+         
+         $.ajax({
+          type: "POST",
+          url: '/favcart/',
+          contentType: "application/json",
+          data: JSON.stringify(favlist),
+          dataType: "json",
+          success: function(response) {
+              console.log(response);
+          },
+          error: function(err) {
+              console.log(err);
+          }
+          });
 
         // create new fav list
         // favlist.forEach((category) => {
@@ -154,7 +171,8 @@ function buildTableByData(data) {
        
         // category[4] += newCount;
         likesColCell.text(category[4]);
-        
+       
+        // sent fav data back to /favlist
         $.ajax({
         type: "POST",
         url: "/favlist/" + category[5],
@@ -186,6 +204,7 @@ function buildTableByData(data) {
        }
 
       //Filter meter and add selected meter according to yelp_ID
+       var metericons = []
        var meterStatus
        d3.json("/meterloc").then((data) => {
         var filteredMeter = data.filter(row => row["yelp_id"] === food.yelp_id);
@@ -194,49 +213,92 @@ function buildTableByData(data) {
         //  console.log(statusRes)
         //});
         console.log(meters);
-         
-        // $.ajax({
-        // type: "POST",
-        // url: "/favlist",
-        // contentType: "application/json",
-        // data: JSON.stringify(category),
-        // dataType: "json",
-        // success: function(response) {
-        //     console.log(response);
-        // },
-        // error: function(err) {
-        //     console.log(err);
-        // }
-        // });
-                 
         
+        var meterdata = 
+        $.ajax({
+          type: "POST",
+          url: "/meterstatus",
+          async: false,
+          contentType: "application/json",
+          data: JSON.stringify(meters),
+          dataType: "json",
+          success: function(response) {
+              console.log(response);
+              console.log(response.length);
+              // loop through records in response
+              for (var i = 0; i < response.length; i++) {
+                console.log(response[i].status);
+                meterStatusIcon=response[i];
+                if (meterStatusIcon.status == 0)
+                  metericons[i] = "CloseMeter";
+                else 
+                  metericons[i] = "OpenMeter";
+                //console.log(metericons[i])
+              }
+          },
+          error: function(err) {
+              console.log(err);
+          }
+        });
+
       if (meterMarkers) {
           myMap.removeLayer(meterMarkers);
         }
-        
+
         var meterMarkers = L.markerClusterGroup();
-        meterMarkers.addLayer(L.marker([meters.meter1[1], meters.meter1[2]]).bindPopup("meter1"+"</br>"+meters.meter1[3]));
-        meterMarkers.addLayer(L.marker([meters.meter2[1], meters.meter2[2]]).bindPopup("meter2"+"</br>"+meters.meter2[3]));
-        meterMarkers.addLayer(L.marker([meters.meter3[1], meters.meter3[2]]).bindPopup( "meter3"+"</br>"+meters.meter3[3]));
-        meterMarkers.addLayer(L.marker([meters.meter4[1], meters.meter4[2]]).bindPopup("meter4"+"</br>"+meters.meter4[3]));
-        meterMarkers.addLayer(L.marker([meters.meter5[1], meters.meter5[2]]).bindPopup("meter5"+"</br>"+meters.meter5[3]));
-        meterMarkers.addLayer(L.marker([meters.meter6[1], meters.meter6[2]]).bindPopup("meter6"+"</br>"+meters.meter6[3]));
-        meterMarkers.addLayer(L.marker([meters.meter7[1], meters.meter7[2]]).bindPopup("meter7"+"</br>"+meters.meter7[3]));
-        meterMarkers.addLayer(L.marker([meters.meter8[1], meters.meter8[2]]).bindPopup("meter8"+"</br>"+meters.meter8[3]));
-        meterMarkers.addLayer(L.marker([meters.meter9[1], meters.meter9[2]]).bindPopup("meter9"+"</br>"+meters.meter9[3]));
-        meterMarkers.addLayer(L.marker([meters.meter10[1], meters.meter10[2]]).bindPopup("meter10"+"</br>"+meters.meter10[3]));
+        meterMarkers.addLayer(L.marker([meters.meter1[1], meters.meter1[2]], {icon: icons[metericons[0]]}).bindPopup("meter1"+"</br>"+meters.meter1[3]));
+        meterMarkers.addLayer(L.marker([meters.meter2[1], meters.meter2[2]], {icon: icons[metericons[1]]}).bindPopup("meter2"+"</br>"+meters.meter2[3]));
+        meterMarkers.addLayer(L.marker([meters.meter3[1], meters.meter3[2]], {icon: icons[metericons[2]]}).bindPopup( "meter3"+"</br>"+meters.meter3[3]));
+        meterMarkers.addLayer(L.marker([meters.meter4[1], meters.meter4[2]], {icon: icons[metericons[3]]}).bindPopup("meter4"+"</br>"+meters.meter4[3]));
+        meterMarkers.addLayer(L.marker([meters.meter5[1], meters.meter5[2]], {icon: icons[metericons[4]]}).bindPopup("meter5"+"</br>"+meters.meter5[3]));
+        meterMarkers.addLayer(L.marker([meters.meter6[1], meters.meter6[2]], {icon: icons[metericons[5]]}).bindPopup("meter6"+"</br>"+meters.meter6[3]));
+        meterMarkers.addLayer(L.marker([meters.meter7[1], meters.meter7[2]], {icon: icons[metericons[6]]}).bindPopup("meter7"+"</br>"+meters.meter7[3]));
+        meterMarkers.addLayer(L.marker([meters.meter8[1], meters.meter8[2]], {icon: icons[metericons[7]]}).bindPopup("meter8"+"</br>"+meters.meter8[3]));
+        meterMarkers.addLayer(L.marker([meters.meter9[1], meters.meter9[2]], {icon: icons[metericons[8]]}).bindPopup("meter9"+"</br>"+meters.meter9[3]));
+        meterMarkers.addLayer(L.marker([meters.meter10[1], meters.meter10[2], {icon: icons[metericons[9]]}]).bindPopup("meter10"+"</br>"+meters.meter10[3]))
 
         myMap.addLayer(meterMarkers);
         //var group = new L.featureGroup([marker1, marker2, marker3]);
         myMap.fitBounds(meterMarkers.getBounds());
+        // sent meter info back to "/meterstatus"
+        
+        // var layers = {
+        //   ON: new L.LayerGroup(),
+        //   OFF: new L.LayerGroup(),
+        // };
+        // var map = L.map("map-id", {
+        //   center: [40.73, -74.0059],
+        //   zoom: 12,
+        //   layers: [
+        //     layers.ON,
+        //     layers.OFF]
+        // });
+
+        // // Create an overlays object to add to the layer control
+        //   var overlays = {
+        //   "Station Available": layers.ON,
+        //   "Station Occupied": layers.OFF,
+        //   };
+        //   // Create a control for our layers, add our overlay layers to it
+        // L.control.layers(null, overlays).addTo(map);
+
+        // // Create a legend to display information about our map
+        // var info = L.control({
+        // position: "bottomright"
+        //   });
+        // // When the layer control is added, insert a div with the class of "legend"       
+        // info.onAdd = function() {
+        // var div = L.DomUtil.create("div", "legend");
+        //  return div;
+        // };
+        // // Add the info legend to the map
+        // info.addTo(map);
+
+
+        });
       });
-
-
     });
-  })
-
 }
-
 
 function updateFilters() {
   var changedElement = d3.select(this).select("select");
@@ -265,7 +327,7 @@ function filterTable(filters) {
 
 function init() {
   // Grab a reference to the dropdown select element
-  var selector = d3.select("#foodtype");
+  var selector= d3.select("#foodtype");
 
   // Use the list of sample names to populate the select options
   d3.json("/foodtype").then((sampleNames) => {
@@ -275,7 +337,17 @@ function init() {
         .text(sample)
         .property("value", sample);
     });
-   
+  // });
+
+  //  var selector2 = d3.select("#price");
+  //  d3.json("/yelpdata").then((sampleNames) => {
+  //   sampleNames.forEach((sample) => {
+  //     selector
+  //       .append("option")
+  //       .text(sample)
+  //       .property("value", sample);
+  //   });
+  // });
     // Use the first sample from the list to build the initial plots
     const firstSample = sampleNames[0];
     // buildCharts(firstSample);
