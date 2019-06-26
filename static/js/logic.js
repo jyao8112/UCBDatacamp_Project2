@@ -47,7 +47,7 @@
     var barDiv = document.getElementById("bar");
     var trace1 = {
       x: [category_title2], 
-      y: [price_range],
+      y: [price_cheap],
       type: 'bar',
       name: 'Primary Product',
       marker: {
@@ -86,17 +86,18 @@
         opacity: 0.5
     }};
 
-    var data = [trace1, trace2, trace3, trace4];
+    var data2 = [trace1];
   
-    var layout = {
-    title: 'Restaurant Price Distribution',
-    xaxis: {
-      tickangle: -45
-    },
-    barmode: 'group'
-  };
-  
-  Plotly.newPlot(barDiv, data, layout, {showSendToCloud:true});
+    var layout2 = {
+      xaxis: {
+        autorange: true
+      },
+      yaxis: {
+        autorange: true
+      },
+      barmode: 'group'
+    };
+    Plotly.newPlot(barDiv, data2, layout2);
   
   // layermap
   
