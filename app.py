@@ -187,6 +187,40 @@ def welcome():
 def map():
     return render_template("map.html")
 
+	
+@app.route("/ppt/")
+def ppt():
+    return render_template("ppt.html")
+# @app.route("/testmeters")
+# def objectids():
+#     """Return a list of stations."""
+#     results = session.query(meters.street_name).all()
+#     print(results)
+#     street_name = list(np.ravel(results))
+#     return jsonify(street_name)
+@app.route("/restaurant_stat1")
+def stat_typrnum():
+    """return restaurant types and count for stat charts"""
+    results = db.session.query(restaurant_yelp.category_title, func.count(restaurant_yelp.review_count)).\
+    group_by(restaurant_yelp.category_title).order_by(func.count(restaurant_yelp.review_count).desc()).all()
+    # db.session.query(restaurant_yelp.category_title, func.count(restaurant_yelp.review_count)).\
+    # group_by(restaurant_yelp.category_title).order_by(func.count(restaurant_yelp.review_count).desc()).all()
+    category = [result[0] for result in results]
+    reviews = [int(result[1]) for result in results]
+    food_type = {
+       "category_title": category,
+       "review_count": reviews,
+    }
+    return jsonify(food_type)
+@app.route("/restaurant_stat2")
+def stat_review():
+    "return restaurant types and total review counts for each type"
+    sel = [restaurant_yelp.category_title, 
+       func.sum(restaurant_yelp.review_count),
+       func.avg(restaurant_yelp.review_count)]
+    results = db.session.query(*sel).group_by(restaurant_yelp.category_title).order_by(restaurant_yelp.category_title).all()
+    return jsonify(results)
+
 @app.route("/foodtype")
 def get_category():
     results = db.session.query(restaurant_yelp.category_title).group_by(restaurant_yelp.category_title).all()

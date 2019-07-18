@@ -22,27 +22,27 @@ function buildFullTable() {
   d3.json("/yelpdata").then((data) => {
     foodtypeData = data;
     buildTableByData(data);
-    buildMapByData(data);
+    buildMapByData(data); 
   });
 }
 //define different icon 
 var StoreIcon = L.icon({
   iconUrl: 'https://image.flaticon.com/icons/svg/1916/1916263.svg',
   iconSize: [38, 95],
-  iconAnchor: [22, 94],
+  iconAnchor: [38, 95],
   popupAnchor: [-3, -76],
 });
 
 var icons = {
   OpenMeter: L.icon({
     iconUrl: 'https://image.flaticon.com/icons/svg/148/148767.svg',
-    iconSize: [25, 75],
+    iconSize: [25, 94],
     iconAnchor: [22, 94],
     popupAnchor: [-3, -76],
   }),
   CloseMeter: L.icon({
     iconUrl: 'https://image.flaticon.com/icons/svg/148/148766.svg',
-    iconSize: [25, 7  5],
+    iconSize: [25, 94],
     iconAnchor: [22, 94],
     popupAnchor: [-3, -76],
   })
@@ -59,7 +59,7 @@ function buildMapByData(data) {
 
   data.forEach((business) => {
     // Add a new marker to the cluster group and bind a pop-up
-    markers.addLayer(L.marker(business.coordinates, {icon: StoreIcon}).bindPopup(business.name + "</br>(Rating: " + business.rating + ")"+"</br>(Price: " + business.price + ")"));
+    markers.addLayer(L.marker(business.coordinates, {icon: StoreIcon}).bindPopup(business.name + "</br>(Rating: " + business.address + ")"+"</br>(Price: " + business.price + ") "));
   });
 
   myMap.addLayer(markers);
@@ -255,9 +255,9 @@ function buildTableByData(data) {
         meterMarkers.addLayer(L.marker([meters.meter7[1], meters.meter7[2]], {icon: icons[metericons[6]]}).bindPopup("meter7"+"</br>"+meters.meter7[3]));
         meterMarkers.addLayer(L.marker([meters.meter8[1], meters.meter8[2]], {icon: icons[metericons[7]]}).bindPopup("meter8"+"</br>"+meters.meter8[3]));
         meterMarkers.addLayer(L.marker([meters.meter9[1], meters.meter9[2]], {icon: icons[metericons[8]]}).bindPopup("meter9"+"</br>"+meters.meter9[3]));
-        meterMarkers.addLayer(L.marker([meters.meter10[1], meters.meter10[2], {icon: icons[metericons[9]]}]).bindPopup("meter10"+"</br>"+meters.meter10[3]))
+        meterMarkers.addLayer(L.marker([meters.meter10[1], meters.meter10[2]], {icon: icons[metericons[9]]}).bindPopup("meter10"+"</br>"+meters.meter10[3]))
 
-        myMap.addLayer(meterMarkers);
+        myMap.addLayer(meterMarkers)
         //var group = new L.featureGroup([marker1, marker2, marker3]);
         myMap.fitBounds(meterMarkers.getBounds());
         // sent meter info back to "/meterstatus"
@@ -316,6 +316,8 @@ function updateFilters() {
 }
 buildFullTable();
 
+
+
 function filterTable(filters) {
   let filteredData = foodtypeData;
   Object.entries(filters).forEach(([key, value]) => {
@@ -326,10 +328,7 @@ function filterTable(filters) {
 }
 
 function init() {
-  // Grab a reference to the dropdown select element
   var selector= d3.select("#foodtype");
-
-  // Use the list of sample names to populate the select options
   d3.json("/foodtype").then((sampleNames) => {
     sampleNames.forEach((sample) => {
       selector
