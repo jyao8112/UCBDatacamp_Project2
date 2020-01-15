@@ -105,7 +105,7 @@ var lightmap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/light-v9/til
   attribution: "Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"http://mapbox.com\">Mapbox</a>",
   maxZoom: 18,
   id: "mapbox.light",
-  accessToken: API_KEY
+  accessToken: "pk.eyJ1IjoianVubGluY2hlbiIsImEiOiJjandsZnF4eDkwMzV3NDFtY3Z0aHI0eDdmIn0.mTWkH9uMiPE1yQyEY1SAdQ"
 });
 
 // Initialize all of the LayerGroups we'll be using
