@@ -14,3 +14,6 @@ User will be able to liked a restaurant, data will be send back to database and 
 ![alt text](https://github.com/jyao8112/UCBDatacamp_Project2/blob/master/images/Picture1.png)
 ![alt text](https://github.com/jyao8112/UCBDatacamp_Project2/blob/master/images/Picture2.png)
 ![alt text](https://github.com/jyao8112/UCBDatacamp_Project2/blob/master/images/Picture3.png)
+![alt text](https://github.com/jyao8112/UCBDatacamp_Project2/blob/master/images/Screen%20Shot%202019-08-08%20at%201.53.38%20AM.png)
+![alt text](https://github.com/jyao8112/UCBDatacamp_Project2/blob/master/images/Screen%20Shot%202019-08-08%20at%201.45.42%20AM.png)
+![alt text](https://github.com/jyao8112/UCBDatacamp_Project2/blob/master/images/Screen%20Shot%202019-08-08%20at%201.53.54%20AM.png)
